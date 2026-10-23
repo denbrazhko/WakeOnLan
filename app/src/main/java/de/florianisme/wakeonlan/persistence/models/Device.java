@@ -33,6 +33,11 @@ public class Device implements Parcelable {
 
     public String sshPassword;
 
+    public boolean sshUseKey;
+    public String sshPrivateKey;
+    public String sshKeyPassphrase;
+    public String sshHostFingerprint;
+
     public String sshCommand;
 
     public Device(int id, String name, String macAddress, String broadcastAddress, int port, String statusIp, String secureOnPassword,
@@ -82,6 +87,10 @@ public class Device implements Parcelable {
         this.sshUsername = in.readString();
         this.sshPassword = in.readString();
         this.sshCommand = in.readString();
+        this.sshUseKey = in.readInt() != 0;
+        this.sshPrivateKey = in.readString();
+        this.sshKeyPassphrase = in.readString();
+        this.sshHostFingerprint = in.readString();
     }
 
     @Override
@@ -105,5 +114,9 @@ public class Device implements Parcelable {
         dest.writeString(sshUsername);
         dest.writeString(sshPassword);
         dest.writeString(sshCommand);
+        dest.writeInt(sshUseKey ? 1 : 0);
+        dest.writeString(sshPrivateKey);
+        dest.writeString(sshKeyPassphrase);
+        dest.writeString(sshHostFingerprint);
     }
 }

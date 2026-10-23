@@ -9,6 +9,7 @@ import de.florianisme.wakeonlan.persistence.migrations.MigrationFrom2To3;
 import de.florianisme.wakeonlan.persistence.migrations.MigrationFrom3To4;
 import de.florianisme.wakeonlan.persistence.migrations.MigrationFrom4To5;
 import de.florianisme.wakeonlan.persistence.migrations.MigrationFrom5To6;
+import de.florianisme.wakeonlan.persistence.migrations.MigrationFrom6To7;
 
 public class DatabaseInstanceManager {
 
@@ -19,7 +20,7 @@ public class DatabaseInstanceManager {
             synchronized (AppDatabase.class) {
                 INSTANCE = Room.databaseBuilder(context, AppDatabase.class, "database-name")
                         .allowMainThreadQueries()
-                        .addMigrations(new MigrationFrom1To2(), new MigrationFrom2To3(), new MigrationFrom3To4(), new MigrationFrom4To5(), new MigrationFrom5To6())
+                        .addMigrations(new MigrationFrom1To2(), new MigrationFrom2To3(), new MigrationFrom3To4(), new MigrationFrom4To5(), new MigrationFrom5To6(), new MigrationFrom6To7())
                         .build();
             }
         }

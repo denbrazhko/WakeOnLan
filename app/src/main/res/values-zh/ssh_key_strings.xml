@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ssh_use_key">使用私钥认证</string>
+    <string name="ssh_key_help">仍需填写 SSH 用户名。请导入私钥，并将对应公钥（.pub）安装到计算机上。导入的私钥和密码短语会在此手机上加密存储，不会导出到 JSON 备份。</string>
+    <string name="ssh_import_key">导入私钥</string>
+    <string name="ssh_remove_key">移除已导入的私钥</string>
+    <string name="ssh_key_imported">已导入私钥</string>
+    <string name="ssh_importing_key">正在导入私钥…</string>
+    <string name="ssh_private_key_required">请先导入私钥。恢复备份后必须重新导入。</string>
+    <string name="ssh_key_import_failed">无法读取此密钥。请选择不超过 64 KB 的 OpenSSH 或 PEM 私钥文件，而非 .pub 文件。</string>
+    <string name="ssh_key_passphrase">私钥密码短语（可选）</string>
+    <string name="ssh_host_fingerprint">服务器指纹（SHA256:…）</string>
+    <string name="ssh_fingerprint_help">私钥认证必须提供此项。在计算机上对 SSH 主机公钥运行 ssh-keygen -lf，复制 SHA256 指纹。指纹变化会阻止连接。</string>
+    <string name="ssh_fingerprint_invalid">请输入服务器指纹：SHA256: 后接 Base64 摘要。</string>
+    <string name="ssh_save_failed">无法安全保存设备。SSH 私钥未保存。</string>
+    <string name="add_device_status_port">状态 TCP 端口（默认：22）</string>
+</resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ssh_use_key">Authenticate with a private key</string>
+    <string name="ssh_key_help">Your SSH username is still required. Import the private key; install its public (.pub) key on the computer. The imported key and passphrase are encrypted on this phone and excluded from JSON backups.</string>
+    <string name="ssh_import_key">Import private key</string>
+    <string name="ssh_remove_key">Remove imported key</string>
+    <string name="ssh_key_imported">Private key imported</string>
+    <string name="ssh_importing_key">Importing private key…</string>
+    <string name="ssh_private_key_required">Import a private key first. Keys must be re-imported after restoring a backup.</string>
+    <string name="ssh_key_import_failed">Cannot read this key. Select an OpenSSH or PEM private key file (not .pub), up to 64 KB.</string>
+    <string name="ssh_key_passphrase">Private key passphrase (optional)</string>
+    <string name="ssh_host_fingerprint">Server fingerprint (SHA256:…)</string>
+    <string name="ssh_fingerprint_help">Required for private key authentication. Copy the SHA256 fingerprint from ssh-keygen -lf on the computer’s SSH host public key. A changed fingerprint blocks the connection.</string>
+    <string name="ssh_fingerprint_invalid">Enter the server fingerprint: SHA256: followed by its Base64 digest.</string>
+    <string name="ssh_save_failed">Could not save the device securely. Your SSH key was not saved.</string>
+</resources>

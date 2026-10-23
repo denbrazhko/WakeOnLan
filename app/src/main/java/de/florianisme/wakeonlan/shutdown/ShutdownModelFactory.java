@@ -17,11 +17,16 @@ public class ShutdownModelFactory {
         String address = getValueOrFallback(device.sshAddress, device.statusIp);
         int port = getSshPortOrFallback(device.sshPort);
         String username = getValueOrFallback(device.sshUsername, null);
-        String password = getValueOrFallback(device.sshPassword, "");
+        String password = device.sshUseKey ? "" : getValueOrFallback(device.sshPassword, "");
         String command = getValueOrFallback(device.sshCommand, null);
 
-        if (allRequiredFieldsSet(shutdownEnabled, address, username, command)) {
-            return Optional.of(new ShutdownModel(address, port, username, password, command));
+        String fingerprint = getValueOrFallback(device.sshHostFingerprint, "").trim();
+        boolean fingerprintValid = fingerprint.isEmpty() ? !device.sshUseKey
+                : SshAuthentication.isValidFingerprint(fingerprint);
+        boolean keyValid = !device.sshUseKey || (device.sshPrivateKey != null && !device.sshPrivateKey.trim().isEmpty());
+        if (allRequiredFieldsSet(shutdownEnabled, address, username, command) && keyValid && fingerprintValid && port <= 65535) {
+            return Optional.of(new ShutdownModel(address, port, username, password, command,
+                    device.sshUseKey, device.sshPrivateKey, device.sshKeyPassphrase, fingerprint));
         }
 
         return Optional.empty();

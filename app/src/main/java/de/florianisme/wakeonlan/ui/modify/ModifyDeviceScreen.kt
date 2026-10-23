@@ -2,6 +2,8 @@ package de.florianisme.wakeonlan.ui.modify
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +53,10 @@ import androidx.compose.ui.unit.dp
 import de.florianisme.wakeonlan.R
 import de.florianisme.wakeonlan.persistence.models.Device
 import de.florianisme.wakeonlan.ui.theme.WakeOnLanTheme
+import de.florianisme.wakeonlan.shutdown.SshPrivateKeyImport
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /** Runs the broadcast interface lookup and fills the broadcast field, mirroring the old autofill button. */
 fun fillBroadcastAddress(state: DeviceFormState) {
@@ -73,12 +80,39 @@ fun ModifyDeviceScreen(
     var showTestDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showUnsavedDialog by remember { mutableStateOf(false) }
+    var importingKey by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val keyPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            scope.launch {
+                importingKey = true
+                try {
+                    val key = withContext(Dispatchers.IO) {
+                        context.contentResolver.openInputStream(uri).use { input ->
+                            SshPrivateKeyImport.read(requireNotNull(input))
+                        }
+                    }
+                    state.sshPrivateKey = key
+                } catch (e: kotlinx.coroutines.CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Toast.makeText(context, R.string.ssh_key_import_failed, Toast.LENGTH_LONG).show()
+                } finally {
+                    importingKey = false
+                }
+            }
+        }
+    }
 
     fun attemptSave() {
         state.showErrors = true
         if (state.isValid) {
-            onPersist(state.toDevice())
-            onFinish()
+            try {
+                onPersist(state.toDevice())
+                onFinish()
+            } catch (e: Exception) {
+                Toast.makeText(context, R.string.ssh_save_failed, Toast.LENGTH_LONG).show()
+            }
         } else {
             Toast.makeText(context, R.string.add_device_error_save_clicked, Toast.LENGTH_LONG)
                 .show()
@@ -109,7 +143,7 @@ fun ModifyDeviceScreen(
                             )
                         }
                     }
-                    IconButton(onClick = { attemptSave() }) {
+                    IconButton(onClick = { attemptSave() }, enabled = !importingKey) {
                         Icon(
                             Icons.Filled.Save,
                             contentDescription = stringResource(R.string.add_device_menu_save)
@@ -215,6 +249,7 @@ fun ModifyDeviceScreen(
                         value = state.sshPort,
                         onValueChange = { state.sshPort = it },
                         labelRes = R.string.add_device_shutdown_port,
+                        errorRes = if (state.showErrors) state.sshPortError else null,
                         placeholder = "22",
                         keyboardType = KeyboardType.Number,
                         modifier = Modifier.width(120.dp),
@@ -226,11 +261,49 @@ fun ModifyDeviceScreen(
                     labelRes = R.string.add_device_shutdown_username,
                     errorRes = if (state.showErrors) state.sshUsernameError else null,
                 )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Switch(checked = state.sshUseKey, onCheckedChange = { state.sshUseKey = it })
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.ssh_use_key))
+                }
+                if (state.sshUseKey) {
+                    Text(stringResource(R.string.ssh_key_help), style = MaterialTheme.typography.bodySmall)
+                    OutlinedButton(
+                        onClick = { keyPicker.launch(arrayOf("*/*")) },
+                        enabled = !importingKey,
+                    ) {
+                        Text(stringResource(if (importingKey) R.string.ssh_importing_key else R.string.ssh_import_key))
+                    }
+                    if (state.sshPrivateKey.isNotEmpty()) {
+                        Text(stringResource(R.string.ssh_key_imported))
+                        TextButton(onClick = {
+                            state.sshPrivateKey = ""
+                            state.sshKeyPassphrase = ""
+                        }) { Text(stringResource(R.string.ssh_remove_key)) }
+                    }
+                    if (state.showErrors && state.sshPrivateKeyError != null) {
+                        Text(stringResource(state.sshPrivateKeyError!!), color = MaterialTheme.colorScheme.error)
+                    }
+                    LabeledField(
+                        value = state.sshKeyPassphrase,
+                        onValueChange = { state.sshKeyPassphrase = it },
+                        labelRes = R.string.ssh_key_passphrase,
+                        isPassword = true,
+                    )
+                } else {
+                    LabeledField(
+                        value = state.sshPassword,
+                        onValueChange = { state.sshPassword = it },
+                        labelRes = R.string.add_device_shutdown_password,
+                        isPassword = true,
+                    )
+                }
                 LabeledField(
-                    value = state.sshPassword,
-                    onValueChange = { state.sshPassword = it },
-                    labelRes = R.string.add_device_shutdown_password,
-                    isPassword = true,
+                    value = state.sshHostFingerprint,
+                    onValueChange = { state.sshHostFingerprint = it },
+                    labelRes = R.string.ssh_host_fingerprint,
+                    supportingRes = R.string.ssh_fingerprint_help,
+                    errorRes = if (state.showErrors) state.sshFingerprintError else null,
                 )
                 LabeledField(
                     value = state.sshCommand,
@@ -245,6 +318,7 @@ fun ModifyDeviceScreen(
                         state.showErrors = true
                         if (state.isValid) showTestDialog = true
                     },
+                    enabled = !importingKey,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp),
@@ -368,7 +442,7 @@ private fun LabeledField(
         isError = errorRes != null,
         singleLine = true,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        keyboardOptions = KeyboardOptions(keyboardType = if (isPassword) KeyboardType.Password else keyboardType),
         supportingText = when {
             errorRes != null -> {
                 { Text(stringResource(errorRes)) }

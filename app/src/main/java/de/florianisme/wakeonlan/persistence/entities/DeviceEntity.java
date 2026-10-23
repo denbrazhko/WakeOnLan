@@ -47,6 +47,18 @@ public class DeviceEntity {
     @ColumnInfo(name = "ssh_password")
     public String sshPassword;
 
+    @ColumnInfo(name = "ssh_use_key", defaultValue = "0")
+    public boolean sshUseKey;
+
+    @ColumnInfo(name = "ssh_private_key_encrypted")
+    public String sshPrivateKeyEncrypted;
+
+    @ColumnInfo(name = "ssh_key_passphrase_encrypted")
+    public String sshKeyPassphraseEncrypted;
+
+    @ColumnInfo(name = "ssh_host_fingerprint")
+    public String sshHostFingerprint;
+
     @ColumnInfo(name = "ssh_command")
     public String sshCommand;
 

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import de.florianisme.wakeonlan.R
 import de.florianisme.wakeonlan.persistence.models.Device
+import de.florianisme.wakeonlan.shutdown.SshAuthentication
 
 /**
  * Holds the mutable state of the add/edit device form and derives validation errors,
@@ -27,6 +28,10 @@ class DeviceFormState(initial: Device? = null) {
     var sshPort by mutableStateOf(sshPortFallback(initial))
     var sshUsername by mutableStateOf(initial?.sshUsername.orEmpty())
     var sshPassword by mutableStateOf(initial?.sshPassword.orEmpty())
+    var sshUseKey by mutableStateOf(initial?.sshUseKey ?: false)
+    var sshPrivateKey by mutableStateOf(initial?.sshPrivateKey.orEmpty())
+    var sshKeyPassphrase by mutableStateOf(initial?.sshKeyPassphrase.orEmpty())
+    var sshHostFingerprint by mutableStateOf(initial?.sshHostFingerprint.orEmpty())
     var sshCommand by mutableStateOf(initial?.sshCommand.orEmpty())
 
     /** Set to true after the first save attempt so errors are shown for untouched fields too. */
@@ -48,26 +53,37 @@ class DeviceFormState(initial: Device? = null) {
         get() = DeviceFormValidation.validateSecureOnPassword(secureOn)
     val sshAddressError: Int?
         get() = DeviceFormValidation.validateConditionalNotEmpty(
-            sshAddress,
+            sshAddress.trim(),
             statusIpFallbackMissing,
             R.string.add_device_error_ssh_address_empty
         )
     val sshUsernameError: Int?
         get() = DeviceFormValidation.validateConditionalNotEmpty(
-            sshUsername,
+            sshUsername.trim(),
             remoteShutdownEnabled,
             R.string.add_device_error_ssh_username_empty
         )
     val sshCommandError: Int?
         get() = DeviceFormValidation.validateConditionalNotEmpty(
-            sshCommand,
+            sshCommand.trim(),
             remoteShutdownEnabled,
             R.string.add_device_error_ssh_command_empty
         )
 
+    val sshPortError: Int?
+        get() = if (remoteShutdownEnabled) DeviceFormValidation.validatePort(sshPort.trim()) else null
+    val sshPrivateKeyError: Int?
+        get() = if (remoteShutdownEnabled && sshUseKey && sshPrivateKey.isBlank())
+            R.string.ssh_private_key_required else null
+    val sshFingerprintError: Int?
+        get() = if (remoteShutdownEnabled && (sshUseKey || sshHostFingerprint.isNotBlank()) &&
+            !SshAuthentication.isValidFingerprint(sshHostFingerprint.trim()))
+            R.string.ssh_fingerprint_invalid else null
+
     val isValid: Boolean
         get() = nameError == null && macError == null && portError == null && statusPortError == null && secureOnError == null &&
-                sshAddressError == null && sshUsernameError == null && sshCommandError == null
+                sshAddressError == null && sshUsernameError == null && sshCommandError == null &&
+                sshPortError == null && sshPrivateKeyError == null && sshFingerprintError == null
 
     fun getPort(): Int = port.trim().toIntOrNull() ?: 9
 
@@ -76,7 +92,8 @@ class DeviceFormState(initial: Device? = null) {
     private fun getSshPort(): Int = sshPort.trim().toIntOrNull() ?: -1
 
     fun toDevice(): Device {
-        val device = existing ?: Device()
+        val device = Device()
+        device.id = existing?.id ?: 0
         device.name = name.trim()
         device.statusIp = statusIp.trim()
         device.statusPort = getStatusPort()
@@ -88,7 +105,11 @@ class DeviceFormState(initial: Device? = null) {
         device.sshAddress = sshAddress.trim()
         device.sshPort = getSshPort()
         device.sshUsername = sshUsername.trim()
-        device.sshPassword = sshPassword.trim()
+        device.sshPassword = if (sshUseKey) "" else sshPassword
+        device.sshUseKey = sshUseKey
+        device.sshPrivateKey = sshPrivateKey
+        device.sshKeyPassphrase = sshKeyPassphrase
+        device.sshHostFingerprint = sshHostFingerprint.trim()
         device.sshCommand = sshCommand.trim()
         return device
     }
@@ -106,7 +127,11 @@ class DeviceFormState(initial: Device? = null) {
                 device.sshAddress.orEmpty() == sshAddress.trim() &&
                 (device.sshPort ?: -1) == getSshPort() &&
                 device.sshUsername.orEmpty() == sshUsername.trim() &&
-                device.sshPassword.orEmpty() == sshPassword.trim() &&
+                device.sshPassword.orEmpty() == (if (sshUseKey) "" else sshPassword) &&
+                device.sshUseKey == sshUseKey &&
+                device.sshPrivateKey.orEmpty() == sshPrivateKey &&
+                device.sshKeyPassphrase.orEmpty() == sshKeyPassphrase &&
+                device.sshHostFingerprint.orEmpty() == sshHostFingerprint.trim() &&
                 device.sshCommand.orEmpty() == sshCommand.trim()
     }
 
@@ -115,7 +140,8 @@ class DeviceFormState(initial: Device? = null) {
                 broadcast.trim().isEmpty() && statusIp.trim().isEmpty() &&
                 secureOn.trim().isEmpty() && !remoteShutdownEnabled &&
                 sshAddress.trim().isEmpty() && getSshPort() == -1 && sshUsername.trim().isEmpty() &&
-                sshPassword.trim().isEmpty() && sshCommand.trim().isEmpty()
+                sshPassword.isEmpty() && sshCommand.trim().isEmpty() && !sshUseKey &&
+                sshPrivateKey.isEmpty() && sshKeyPassphrase.isEmpty() && sshHostFingerprint.trim().isEmpty()
 
     companion object {
         private fun sshPortFallback(initial: Device?): String {

@@ -51,6 +51,12 @@ public class DeviceBackupModel {
     @SerializedName(value = "ssh_password")
     public String sshPassword;
 
+    @SerializedName("ssh_use_key")
+    public boolean sshUseKey;
+
+    @SerializedName("ssh_host_fingerprint")
+    public String sshHostFingerprint;
+
     @SerializedName(value = "ssh_command")
     public String sshCommand;
 
@@ -67,7 +73,9 @@ public class DeviceBackupModel {
         this.sshAddress = device.sshAddress;
         this.sshPort = device.sshPort;
         this.sshUsername = device.sshUsername;
-        this.sshPassword = device.sshPassword;
+        this.sshPassword = device.sshUseKey ? null : device.sshPassword;
+        this.sshUseKey = device.sshUseKey;
+        this.sshHostFingerprint = device.sshHostFingerprint;
         this.sshCommand = device.sshCommand;
     }
 
@@ -75,6 +83,8 @@ public class DeviceBackupModel {
         Device device = new Device(this.id, this.name, this.macAddress, this.broadcastAddress, this.port, this.statusIp, this.secureOnPassword,
                 this.remoteShutdownEnabled, this.sshAddress, this.sshPort, this.sshUsername, this.sshPassword, this.sshCommand);
         device.statusPort = this.statusPort;
+        device.sshUseKey = this.sshUseKey;
+        device.sshHostFingerprint = this.sshHostFingerprint;
         return device;
     }
 

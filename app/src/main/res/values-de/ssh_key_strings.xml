@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ssh_use_key">Mit privatem Schlüssel anmelden</string>
+    <string name="ssh_key_help">Der SSH-Benutzername bleibt erforderlich. Privaten Schlüssel importieren und den öffentlichen Schlüssel (.pub) auf dem Computer hinterlegen. Schlüssel und Passphrase werden auf diesem Telefon verschlüsselt und nicht in JSON-Sicherungen exportiert.</string>
+    <string name="ssh_import_key">Privaten Schlüssel importieren</string>
+    <string name="ssh_remove_key">Importierten Schlüssel entfernen</string>
+    <string name="ssh_key_imported">Privater Schlüssel importiert</string>
+    <string name="ssh_importing_key">Privater Schlüssel wird importiert…</string>
+    <string name="ssh_private_key_required">Zuerst einen privaten Schlüssel importieren. Nach dem Wiederherstellen einer Sicherung muss er erneut importiert werden.</string>
+    <string name="ssh_key_import_failed">Schlüssel nicht lesbar. Eine private OpenSSH- oder PEM-Schlüsseldatei bis 64 KB auswählen (keine .pub-Datei).</string>
+    <string name="ssh_key_passphrase">Passphrase des privaten Schlüssels (optional)</string>
+    <string name="ssh_host_fingerprint">Server-Fingerabdruck (SHA256:…)</string>
+    <string name="ssh_fingerprint_help">Für die Schlüsselanmeldung erforderlich. Den SHA256-Fingerabdruck mit ssh-keygen -lf aus dem öffentlichen SSH-Hostschlüssel auf dem Computer ermitteln. Ein geänderter Fingerabdruck blockiert die Verbindung.</string>
+    <string name="ssh_fingerprint_invalid">Server-Fingerabdruck eingeben: SHA256: gefolgt vom Base64-Hash.</string>
+    <string name="ssh_save_failed">Gerät konnte nicht sicher gespeichert werden. Der SSH-Schlüssel wurde nicht gespeichert.</string>
+    <string name="add_device_status_port">TCP-Port für Status (Standard: 22)</string>
+</resources>

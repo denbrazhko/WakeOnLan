@@ -2,21 +2,16 @@ package de.florianisme.wakeonlan.shutdown;
 
 import android.util.Log;
 
-import com.google.common.base.Throwables;
-
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.LoggerFactory;
 import net.schmizz.sshj.common.StreamCopier;
 import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.transport.TransportException;
-import net.schmizz.sshj.transport.verification.HostKeyVerifier;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.PublicKey;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import de.florianisme.wakeonlan.shutdown.exception.CommandExecuteException;
 import de.florianisme.wakeonlan.shutdown.listener.ShutdownExecutorListener;
@@ -28,33 +23,31 @@ public class ShutdownRunnable implements Runnable {
 
     private final ShutdownModel shutdownModel;
     private final ShutdownExecutorListener shutdownExecutorListener;
+    private final Supplier<SSHClient> clientFactory;
 
     public ShutdownRunnable(ShutdownModel shutdownModel, ShutdownExecutorListener shutdownExecutorListener) {
+        this(shutdownModel, shutdownExecutorListener, SSHClient::new);
+    }
+
+    ShutdownRunnable(ShutdownModel shutdownModel, ShutdownExecutorListener shutdownExecutorListener,
+                     Supplier<SSHClient> clientFactory) {
         this.shutdownModel = shutdownModel;
         this.shutdownExecutorListener = shutdownExecutorListener;
+        this.clientFactory = clientFactory;
     }
 
     @Override
     public void run() {
         ByteArrayOutputStream commandOutputStream = new ByteArrayOutputStream();
 
-        try (SSHClient sshClient = new SSHClient()) {
-            sshClient.addHostKeyVerifier(new HostKeyVerifier() {
-                @Override
-                public boolean verify(String hostname, int port, PublicKey key) {
-                    return true;
-                }
-
-                @Override
-                public List<String> findExistingAlgorithms(String hostname, int port) {
-                    return Collections.emptyList();
-                }
-            });
+        try (SSHClient sshClient = clientFactory.get()) {
+            SshAuthentication.configureHostVerification(sshClient, shutdownModel);
             sshClient.setConnectTimeout(CONNECT_TIMEOUT);
+            sshClient.setTimeout(EXECUTE_TIMEOUT);
             sshClient.connect(shutdownModel.getSshAddress(), shutdownModel.getSshPort());
             shutdownExecutorListener.onTargetHostReached();
 
-            sshClient.authPassword(shutdownModel.getUsername(), shutdownModel.getPassword());
+            SshAuthentication.authenticate(sshClient, shutdownModel);
             shutdownExecutorListener.onLoginSuccessful();
 
             Session session = sshClient.startSession();
@@ -68,17 +61,15 @@ public class ShutdownRunnable implements Runnable {
 
             exec.join(EXECUTE_TIMEOUT, TimeUnit.MILLISECONDS);
             Integer exitStatus = exec.getExitStatus();
+            if (exitStatus == null) {
+                throw new IOException("SSH command ended without an exit status; execution could not be confirmed");
+            }
             if (exitStatus != 0) {
                 throw new CommandExecuteException("Command exited with status code " + exitStatus, exitStatus);
             }
 
             shutdownExecutorListener.onCommandExecuteSuccessful();
         } catch (Exception e) {
-            if (Throwables.getRootCause(e) instanceof TransportException) {
-                shutdownExecutorListener.onCommandExecuteSuccessful();
-                return;
-            }
-
             Log.e(ShutdownRunnable.class.getSimpleName(), "Error during SSH execution", e);
 
             if (sudoPrompt(commandOutputStream)) {
