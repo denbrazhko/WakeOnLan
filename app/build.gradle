@@ -11,6 +11,10 @@ android {
         compose true
     }
 
+    buildTypes.configureEach {
+        proguardFiles 'proguard-rules.pro'
+    }
+
     packaging {
         resources {
             excludes += 'META-INF/LICENSE.md'

@@ -26,7 +26,7 @@ public class ShutdownRunnable implements Runnable {
     private final Supplier<SSHClient> clientFactory;
 
     public ShutdownRunnable(ShutdownModel shutdownModel, ShutdownExecutorListener shutdownExecutorListener) {
-        this(shutdownModel, shutdownExecutorListener, SSHClient::new);
+        this(shutdownModel, shutdownExecutorListener, SshCryptoProvider::createClient);
     }
 
     ShutdownRunnable(ShutdownModel shutdownModel, ShutdownExecutorListener shutdownExecutorListener,
