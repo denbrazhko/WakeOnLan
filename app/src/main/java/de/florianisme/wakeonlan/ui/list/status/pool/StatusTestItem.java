@@ -58,7 +58,7 @@ public class StatusTestItem {
         return device;
     }
 
-    public void pausePingRunnable(StatusTestType testType) {
+    public void pauseStatusRunnable(StatusTestType testType) {
         synchronized (listeners) {
             if (runnableOnlyRunningForType(testType)) {
                 cancelRunnable();

@@ -179,6 +179,14 @@ fun ModifyDeviceScreen(
                 placeholder = "192.168.0.100",
                 supportingRes = R.string.add_device_status_ip_helper,
             )
+            LabeledField(
+                value = state.statusPort,
+                onValueChange = { state.statusPort = it },
+                labelRes = R.string.add_device_status_port,
+                placeholder = "22",
+                errorRes = if (state.showErrors) state.statusPortError else null,
+                keyboardType = KeyboardType.Number,
+            )
 
             SectionTitle(R.string.add_device_shutdown)
             Row(verticalAlignment = Alignment.CenterVertically) {

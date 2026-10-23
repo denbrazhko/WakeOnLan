@@ -95,7 +95,7 @@
     <string name="execution_error_command_not_executable">Kommando nicht ausführbar</string>
     <string name="test_shutdown_error_execution_timeout">Ausführung des Kommandos \"%1$s\" dauerte zu lange oder sudo Passwort-Aufforderung wurde gestartet</string>
     <string name="test_shutdown_error_unknown_host">Unbekannter Hostname \"%1$s\"</string>
-    <string name="add_device_status_ip_helper">Onlinestatus des Geräts wird regelmäßig unter dieser Adresse per Ping-Befehl abgefragt</string>
+    <string name="add_device_status_ip_helper">Prüft eine TCP-Verbindung zum angegebenen Host und Status-Port. Für Fernzugriff den TCP-Port an einen laufenden Dienst auf dem Computer weiterleiten. Ohne Host erfolgt keine Statusprüfung.</string>
     <string name="add_device_shutdown_explanation">Nutzt SSH um sich am Zielsystem anzumelden und über das entsprechende Kommando herunterzufahren.</string>
     <string name="add_device_error_port_invalid">Ungültiger Port</string>
     <string name="local_network_permission_denied_title">Berechtigung erforderlich</string>

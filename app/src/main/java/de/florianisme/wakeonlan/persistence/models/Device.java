@@ -19,6 +19,8 @@ public class Device implements Parcelable {
 
     public String statusIp;
 
+    public int statusPort = 22;
+
     public String secureOnPassword;
 
     public boolean remoteShutdownEnabled;
@@ -72,6 +74,7 @@ public class Device implements Parcelable {
         this.broadcastAddress = in.readString();
         this.port = in.readInt();
         this.statusIp = in.readString();
+        this.statusPort = in.readInt();
         this.secureOnPassword = in.readString();
         this.remoteShutdownEnabled = in.readInt() >= 1;
         this.sshAddress = in.readString();
@@ -94,6 +97,7 @@ public class Device implements Parcelable {
         dest.writeString(broadcastAddress);
         dest.writeInt(port);
         dest.writeString(statusIp);
+        dest.writeInt(statusPort);
         dest.writeString(secureOnPassword);
         dest.writeInt(remoteShutdownEnabled ? 1 : 0);
         dest.writeString(sshAddress);

@@ -66,7 +66,7 @@ import de.florianisme.wakeonlan.persistence.models.DeviceStatus
 import de.florianisme.wakeonlan.persistence.repository.DeviceRepository
 import de.florianisme.wakeonlan.shutdown.ShutdownExecutor
 import de.florianisme.wakeonlan.shutdown.ShutdownModelFactory
-import de.florianisme.wakeonlan.ui.list.status.pool.PingStatusTesterPool
+import de.florianisme.wakeonlan.ui.list.status.pool.TcpStatusTesterPool
 import de.florianisme.wakeonlan.ui.list.status.pool.StatusTestType
 import de.florianisme.wakeonlan.ui.modify.AddDeviceActivity
 import de.florianisme.wakeonlan.ui.modify.EditDeviceActivity
@@ -74,7 +74,7 @@ import de.florianisme.wakeonlan.ui.theme.WakeOnLanTheme
 import de.florianisme.wakeonlan.wol.WolSender
 import kotlinx.coroutines.launch
 
-private val statusTesterPool = PingStatusTesterPool.getInstance()
+private val statusTesterPool = TcpStatusTesterPool.getInstance()
 
 @Composable
 fun DeviceListScreen() {

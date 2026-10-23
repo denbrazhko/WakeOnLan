@@ -16,6 +16,7 @@ class DeviceFormState(initial: Device? = null) {
 
     var name by mutableStateOf(initial?.name.orEmpty())
     var statusIp by mutableStateOf(initial?.statusIp.orEmpty())
+    var statusPort by mutableStateOf((initial?.statusPort ?: 22).toString())
     var mac by mutableStateOf(initial?.macAddress.orEmpty())
     var broadcast by mutableStateOf(initial?.broadcastAddress.orEmpty())
     var port by mutableStateOf(initial?.let { it.port.toString() } ?: "9")
@@ -40,6 +41,9 @@ class DeviceFormState(initial: Device? = null) {
         get() = DeviceFormValidation.validateMac(mac)
     val portError: Int?
         get() = DeviceFormValidation.validatePort(port.trim())
+    val statusPortError: Int?
+        get() = if (statusIp.trim().isEmpty()) null else
+            DeviceFormValidation.validatePort(statusPort.trim())
     val secureOnError: Int?
         get() = DeviceFormValidation.validateSecureOnPassword(secureOn)
     val sshAddressError: Int?
@@ -62,10 +66,12 @@ class DeviceFormState(initial: Device? = null) {
         )
 
     val isValid: Boolean
-        get() = nameError == null && macError == null && portError == null && secureOnError == null &&
+        get() = nameError == null && macError == null && portError == null && statusPortError == null && secureOnError == null &&
                 sshAddressError == null && sshUsernameError == null && sshCommandError == null
 
     fun getPort(): Int = port.trim().toIntOrNull() ?: 9
+
+    private fun getStatusPort(): Int = statusPort.trim().toIntOrNull() ?: 22
 
     private fun getSshPort(): Int = sshPort.trim().toIntOrNull() ?: -1
 
@@ -73,6 +79,7 @@ class DeviceFormState(initial: Device? = null) {
         val device = existing ?: Device()
         device.name = name.trim()
         device.statusIp = statusIp.trim()
+        device.statusPort = getStatusPort()
         device.macAddress = mac.trim()
         device.broadcastAddress = broadcast.trim()
         device.port = getPort()
@@ -92,6 +99,7 @@ class DeviceFormState(initial: Device? = null) {
                 device.broadcastAddress.orEmpty() == broadcast.trim() &&
                 device.macAddress.orEmpty() == mac.trim() &&
                 device.statusIp.orEmpty() == statusIp.trim() &&
+                device.statusPort == getStatusPort() &&
                 device.port == getPort() &&
                 device.secureOnPassword.orEmpty() == secureOn.trim() &&
                 device.remoteShutdownEnabled == remoteShutdownEnabled &&
@@ -103,7 +111,7 @@ class DeviceFormState(initial: Device? = null) {
     }
 
     private fun isEmptyForm(): Boolean =
-        name.trim().isEmpty() && mac.trim().isEmpty() && getPort() == 9 &&
+        name.trim().isEmpty() && mac.trim().isEmpty() && getPort() == 9 && getStatusPort() == 22 &&
                 broadcast.trim().isEmpty() && statusIp.trim().isEmpty() &&
                 secureOn.trim().isEmpty() && !remoteShutdownEnabled &&
                 sshAddress.trim().isEmpty() && getSshPort() == -1 && sshUsername.trim().isEmpty() &&

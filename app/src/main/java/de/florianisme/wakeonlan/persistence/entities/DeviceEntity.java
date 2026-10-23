@@ -26,6 +26,9 @@ public class DeviceEntity {
     @ColumnInfo(name = "status_ip")
     public String statusIp;
 
+    @ColumnInfo(name = "status_port", defaultValue = "22")
+    public int statusPort = 22;
+
     @ColumnInfo(name = "secure_on_password")
     public String secureOnPassword;
 

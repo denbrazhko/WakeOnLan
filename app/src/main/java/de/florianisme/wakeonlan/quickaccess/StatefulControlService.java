@@ -19,7 +19,7 @@ import de.florianisme.wakeonlan.R;
 import de.florianisme.wakeonlan.persistence.models.Device;
 import de.florianisme.wakeonlan.persistence.models.DeviceStatus;
 import de.florianisme.wakeonlan.persistence.repository.DeviceRepository;
-import de.florianisme.wakeonlan.ui.list.status.pool.PingStatusTesterPool;
+import de.florianisme.wakeonlan.ui.list.status.pool.TcpStatusTesterPool;
 import de.florianisme.wakeonlan.ui.list.status.pool.StatusTestType;
 import de.florianisme.wakeonlan.ui.list.status.pool.StatusTesterPool;
 import io.reactivex.processors.ReplayProcessor;
@@ -27,7 +27,7 @@ import io.reactivex.processors.ReplayProcessor;
 @RequiresApi(api = Build.VERSION_CODES.R)
 public class StatefulControlService {
 
-    private static final StatusTesterPool STATUS_TESTER_POOL = PingStatusTesterPool.getInstance();
+    private static final StatusTesterPool STATUS_TESTER_POOL = TcpStatusTesterPool.getInstance();
 
     static void createAndUpdateStatefulControls(List<String> deviceIds, ReplayProcessor<Control> processor, Context context) {
         DeviceRepository deviceRepository = DeviceRepository.getInstance(context);

@@ -14,12 +14,12 @@ import java.util.concurrent.TimeUnit;
 import de.florianisme.wakeonlan.persistence.models.Device;
 import de.florianisme.wakeonlan.ui.list.status.DeviceStatusListener;
 import de.florianisme.wakeonlan.ui.list.status.DeviceStatusTesterBuilder;
-import de.florianisme.wakeonlan.ui.list.status.PingDeviceStatusTesterBuilder;
+import de.florianisme.wakeonlan.ui.list.status.TcpDeviceStatusTesterBuilder;
 
-public class PingStatusTesterPool implements StatusTesterPool {
+public class TcpStatusTesterPool implements StatusTesterPool {
 
     private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(15);
-    private static final DeviceStatusTesterBuilder DEVICE_STATUS_TESTER = new PingDeviceStatusTesterBuilder();
+    private static final DeviceStatusTesterBuilder DEVICE_STATUS_TESTER = new TcpDeviceStatusTesterBuilder();
 
     private static final Object STATUS_LOCK = new Object();
 
@@ -27,13 +27,13 @@ public class PingStatusTesterPool implements StatusTesterPool {
 
     private static StatusTesterPool INSTANCE;
 
-    private PingStatusTesterPool() {
+    private TcpStatusTesterPool() {
         // No instantiation
     }
 
     public static synchronized StatusTesterPool getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new PingStatusTesterPool();
+            INSTANCE = new TcpStatusTesterPool();
         }
 
         return INSTANCE;
@@ -106,16 +106,16 @@ public class PingStatusTesterPool implements StatusTesterPool {
 
     @Override
     public void pauseAllForType(StatusTestType testType) {
-        Log.i(getClass().getSimpleName(), "Pausing all pings of type " + testType);
+        Log.i(getClass().getSimpleName(), "Pausing all TCP checks of type " + testType);
 
         synchronized (STATUS_LOCK) {
-            statusCheckMap.values().forEach(item -> item.pausePingRunnable(testType));
+            statusCheckMap.values().forEach(item -> item.pauseStatusRunnable(testType));
         }
     }
 
     @Override
     public void resumeAll() {
-        Log.i(getClass().getSimpleName(), "Resuming all previously scheduled pings");
+        Log.i(getClass().getSimpleName(), "Resuming all previously scheduled TCP checks");
 
         synchronized (STATUS_LOCK) {
             statusCheckMap.values().forEach(item -> {

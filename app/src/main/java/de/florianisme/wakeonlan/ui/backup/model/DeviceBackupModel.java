@@ -30,6 +30,9 @@ public class DeviceBackupModel {
     @SerializedName(value = "status_ip", alternate = "f")
     public String statusIp;
 
+    @SerializedName("status_port")
+    public int statusPort = 22;
+
     @SerializedName(value = "secure_on_password", alternate = "g")
     public String secureOnPassword;
 
@@ -58,6 +61,7 @@ public class DeviceBackupModel {
         this.broadcastAddress = device.broadcastAddress;
         this.port = device.port;
         this.statusIp = device.statusIp;
+        this.statusPort = device.statusPort;
         this.secureOnPassword = device.secureOnPassword;
         this.remoteShutdownEnabled = device.remoteShutdownEnabled;
         this.sshAddress = device.sshAddress;
@@ -68,8 +72,10 @@ public class DeviceBackupModel {
     }
 
     public Device toModel() {
-        return new Device(this.id, this.name, this.macAddress, this.broadcastAddress, this.port, this.statusIp, this.secureOnPassword,
+        Device device = new Device(this.id, this.name, this.macAddress, this.broadcastAddress, this.port, this.statusIp, this.secureOnPassword,
                 this.remoteShutdownEnabled, this.sshAddress, this.sshPort, this.sshUsername, this.sshPassword, this.sshCommand);
+        device.statusPort = this.statusPort;
+        return device;
     }
 
     @SuppressWarnings("unused")

@@ -10,6 +10,21 @@ up and running.
 A companion app for Wear OS brings the same control to your wrist, letting you wake your devices
 directly from the watch.
 
+### TCP status checks
+
+In the device settings, set **Status host** to the computer address or your DDNS hostname,
+and **Status TCP port** to a port forwarded to a running TCP service on that computer.
+The default is 22 (for example, OpenSSH Server on Windows); any listening TCP service can
+be used. For example, forward router TCP port 22222 to PC port 22 and enter 22222 in the app.
+These settings are independent of the UDP address and port used to send Wake-on-LAN packets.
+
+Status checks only open and close a TCP connection, without SSH login or commands.
+A successful connection means available; a refused connection or timeout means unavailable.
+An empty host disables checking, and DNS failures show an unknown status. A stopped service
+or blocked port can make an otherwise running PC appear unavailable. The connect timeout is
+two seconds (DNS resolution can take longer), with two seconds between completed checks.
+Existing devices and older backups use status port 22 until you change it.
+
 ### Installation
 
 APKs are published on the [Releases](../../releases) page. Download the latest release and

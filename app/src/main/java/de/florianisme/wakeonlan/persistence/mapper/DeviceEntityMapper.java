@@ -10,8 +10,10 @@ public class DeviceEntityMapper implements EntityMapper<Device, DeviceEntity> {
         if (entity == null) {
             return new Device();
         }
-        return new Device(entity.id, entity.name, entity.macAddress, entity.broadcastAddress, entity.port, entity.statusIp, entity.secureOnPassword,
+        Device device = new Device(entity.id, entity.name, entity.macAddress, entity.broadcastAddress, entity.port, entity.statusIp, entity.secureOnPassword,
                 entity.enableRemoteShutdown, entity.sshAddress, entity.sshPort, entity.sshUsername, entity.sshPassword, entity.sshCommand);
+        device.statusPort = entity.statusPort;
+        return device;
     }
 
     @Override
@@ -19,7 +21,9 @@ public class DeviceEntityMapper implements EntityMapper<Device, DeviceEntity> {
         if (model == null) {
             return new DeviceEntity();
         }
-        return new DeviceEntity(model.id, model.name, model.macAddress, model.broadcastAddress, model.port, model.statusIp, model.secureOnPassword,
+        DeviceEntity entity = new DeviceEntity(model.id, model.name, model.macAddress, model.broadcastAddress, model.port, model.statusIp, model.secureOnPassword,
                 model.remoteShutdownEnabled, model.sshAddress, model.sshPort, model.sshUsername, model.sshPassword, model.sshCommand);
+        entity.statusPort = model.statusPort;
+        return entity;
     }
 }

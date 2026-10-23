@@ -15,7 +15,7 @@
     <string name="device_title_status">状态</string>
     <string name="add_device_name">设备名称</string>
     <string name="add_device_status_ip">状态检测地址（可选）</string>
-    <string name="add_device_status_ip_helper">定期检测此地址的连通性，以显示设备在线状态。</string>
+    <string name="add_device_status_ip_helper">通过 TCP 连接检测此主机和状态端口。远程访问时，请将 TCP 端口转发到计算机上正在运行的服务。留空主机可禁用状态检测。</string>
     <string name="add_device_mac_address">MAC 地址</string>
     <string name="add_device_port">端口</string>
     <string name="add_device_broadcast_address">广播地址（可选）</string>

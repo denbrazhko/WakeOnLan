@@ -14,8 +14,8 @@
     <string name="device_title_security">Security</string>
     <string name="device_title_status">Status</string>
     <string name="add_device_name">Name</string>
-    <string name="add_device_status_ip">Status IP (optional)</string>
-    <string name="add_device_status_ip_helper">Device will be regularly pinged at this address to display it\'s online status</string>
+    <string name="add_device_status_ip">Status host (optional)</string>
+    <string name="add_device_status_ip_helper">Checks a TCP connection to this host and the status port. For remote access, forward that TCP port to a running service on the computer. Leave the host empty to disable status checks.</string>
     <string name="add_device_mac_address">MAC Address</string>
     <string name="add_device_default_port" translatable="false">9</string>
     <string name="add_device_port">Port</string>
@@ -133,4 +133,5 @@
     <string name="local_network_permission_denied_message">Wake on Lan needs the local network permission to send magic packets to your devices. Without it, waking devices will not work.\n\nPlease grant the local network permission in the app settings.</string>
     <string name="local_network_permission_denied_settings">Open settings</string>
     <string name="local_network_permission_denied_dismiss">Not now</string>
+    <string name="add_device_status_port">Status TCP port (default: 22)</string>
 </resources>

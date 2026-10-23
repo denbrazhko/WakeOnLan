@@ -14,14 +14,14 @@ import de.florianisme.wakeonlan.persistence.models.DeviceStatus;
 import de.florianisme.wakeonlan.persistence.repository.DeviceRepository;
 import de.florianisme.wakeonlan.shutdown.ShutdownExecutor;
 import de.florianisme.wakeonlan.ui.list.status.DeviceStatusListener;
-import de.florianisme.wakeonlan.ui.list.status.pool.PingStatusTesterPool;
+import de.florianisme.wakeonlan.ui.list.status.pool.TcpStatusTesterPool;
 import de.florianisme.wakeonlan.ui.list.status.pool.StatusTestType;
 import de.florianisme.wakeonlan.ui.list.status.pool.StatusTesterPool;
 import de.florianisme.wakeonlan.wol.WolSender;
 
 public abstract class DeviceTileService extends TileService implements DeviceStatusListener {
 
-    private final StatusTesterPool statusTesterPool = PingStatusTesterPool.getInstance();
+    private final StatusTesterPool statusTesterPool = TcpStatusTesterPool.getInstance();
 
     private DeviceRepository deviceRepository;
     private Device device;
